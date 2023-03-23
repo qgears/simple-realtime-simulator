@@ -1,0 +1,27 @@
+= Simple Real Time MCU Simulator
+
+This is a simple core library that can be used to implement real time simulator of multi MCU systems.
+
+The library is not a full simulator of a system but a few communication objects that can be used to implement simulation of multi MCU systems with precise real time timings.
+
+== Features of the simulator
+
+ * The simulation time is executed by a virtual clock that is not bound to the clock of the executing PC.
+ * The simulation does not add any non-predictable behaviour. In case the other components of the system are non-random then the results are reporducibly the same in every execution. Simulation of random timings is possible by adding (pseudo) random latencies to the simulated system.
+ * MCUs of the system are executed in separate processes and they communicate through shared memory.
+ * Due to performance reasons cross-MCU events are sent using writing and polling of shared memory. This allows the fastest simulation but uses busy spin lock implementation.
+ * It is possible to simulate multiple MCUs not just 2.
+
+== The basic objects of the library
+
+ * localClock: simulation of MCU clocks (what is typically implemented by a quartz or internal oscillator)
+ * channel(Source): an information channel that can have causal effect between MCUs. Information is written into the channel on the information source side
+ * channelSink: receiver of the information channel.
+ 
+All other features have to be implemented when the library is integrated into the simulated system.
+
+== License
+
+The library is released under the MIT license. See file: LICENSE
+
+

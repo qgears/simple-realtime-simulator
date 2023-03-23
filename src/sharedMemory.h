@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2023 Q-Gears Kft., Hungary
@@ -19,3 +20,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+ */
+
+#ifndef SIM_PC_SIMULATOR_SHAREDMEMORY_H_
+#define SIM_PC_SIMULATOR_SHAREDMEMORY_H_
+
+/// Open/create shared memory used by the simulator.
+
+#include "simulator_types.h"
+
+/// Open the shared memory instance of the simulation instance.
+/// File name of the shared memory object is default or got from environment variable.
+/// The shared memory is mapped to the same pointer in each processes. The shared memory is intended to hold the simulator related objects (channels)
+/// And communication between the MCUs (processes or threads) is done using this shared memory.
+/// @param master true means this is the master process and should create the shared memory. False means this is not master and should wait for shm to exist.
+void * sharedMemory_open(const char * name, uint32_t sizeBytes, bool master);
+
+#endif /* SIM_PC_SIMULATOR_SHAREDMEMORY_H_ */

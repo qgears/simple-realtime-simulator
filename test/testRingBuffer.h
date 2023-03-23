@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2023 Q-Gears Kft., Hungary
@@ -19,3 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+ */
+
+#ifndef SIMULATOR_TEST_RINGBUFFER_H_
+#define SIMULATOR_TEST_RINGBUFFER_H_
+
+/// Self test of the ringBuffer object.
+/// The code will fail with assert in case the test case fails.
+/// The test does not test all features just the ones that did not work correctly in the previous versions.
+void testRingBuffer();
+
+#endif /* SIM_PC_TEST_TESTRINGBUFFER_H_ */

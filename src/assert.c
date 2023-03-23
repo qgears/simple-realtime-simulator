@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2023 Q-Gears Kft., Hungary
@@ -19,3 +20,47 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+ */
+#include "assert.h"
+
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+/* Obtain a backtrace and print it to stdout. https://www.gnu.org/software/libc/manual/html_node/Backtraces.html */
+static void print_trace (void)
+{
+  void *array[10];
+  char **strings;
+  int size, i;
+
+  size = backtrace (array, 10);
+  strings = backtrace_symbols (array, size);
+  if (strings != NULL)
+  {
+	fprintf( stderr, "Stack frames:\n");
+    for (i = 0; i < size; i++)
+      fprintf (stderr, "%s\n", strings[i]);
+  }
+
+  free (strings);
+}
+
+void assert(bool mustBeTrue)
+{
+	if(!mustBeTrue)
+	{
+		fprintf( stderr, "Assert fail\n");
+		print_trace();
+		exit(1);
+	}
+}
+void assertErrno(bool mustBeTrue)
+{
+	if(!mustBeTrue)
+	{
+    perror("Assert fail Errno");
+		print_trace();
+		exit(1);
+	}
+}

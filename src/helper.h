@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2023 Q-Gears Kft., Hungary
@@ -19,3 +20,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+ */
+
+#ifndef SIMULATOR_HELPER_H_
+#define SIMULATOR_HELPER_H_
+/// Helper functions for the simulator implementation.
+
+#include "simulator_types.h"
+
+uint64_t u64_max(uint64_t a, uint64_t b);
+
+
+#endif /* SIM_PC_SIMULATOR_HELPER_H_ */
