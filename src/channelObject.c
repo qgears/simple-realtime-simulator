@@ -47,7 +47,7 @@ static bool wasLogged=false;
 static uint64_t current_millis();
 /// Called by the simulator from the inside of busy loops waiting for other processes.
 /// Detects too long wait periods and emits log messages to stderr in these cases.
-static void busyWaitIterate(uint64_t availableTimestamp, uint64_t targetTimestamp);
+static void busyWaitIterate(uint64_t availableTimestamp, uint64_t targetTimestamp, const char * debugName);
 /// Must be called after the busyWaitIterate cycles to signal that execution goes on.
 static void busyWaitDone(uint64_t availableTimestamp, uint64_t targetTimestamp);
 
@@ -82,7 +82,7 @@ void channelObject_waitSimulatedUntil(channelObject_t * co, uint64_t timestamp)
   {
     while(co->simulatedUntil<timestamp)
     {
-      busyWaitIterate(co->simulatedUntil, timestamp);
+      busyWaitIterate(co->simulatedUntil, timestamp, co->debugName);
     }
     busyWaitDone(co->simulatedUntil, timestamp);
   }
@@ -94,7 +94,7 @@ void channelObject_processEventsUntil(channelObjectSink_t * sink, uint64_t times
 	uint8_t * buffer=sink->readBuffer;
 	while(co->simulatedUntil<timestamp)
 	{
-		busyWaitIterate(co->simulatedUntil, timestamp);
+		busyWaitIterate(co->simulatedUntil, timestamp, co->debugName);
 	}
   busyWaitDone(co->simulatedUntil, timestamp);
   uint32_t availablebytes=ringBuffer_availableRead(&(sink->buffer));
@@ -176,7 +176,7 @@ uint64_t channelObject_insertEvent(channelObject_t * co, uint64_t timestamp, uin
 		  {
         while(ringBuffer_availableWrite(&(sink->buffer))< channelObject_datagramSize(co))
         {
-          busyWaitIterate(timestamp, timestamp);
+          busyWaitIterate(timestamp, timestamp, "write ringbuffer");
         }
         busyWaitDone(timestamp, timestamp);
 		  }
@@ -219,7 +219,7 @@ static uint64_t current_millis() {
     return milliseconds;
 }
 
-static void busyWaitIterate(uint64_t availableTimestamp, uint64_t targetTimestamp)
+static void busyWaitIterate(uint64_t availableTimestamp, uint64_t targetTimestamp, const char * debugName)
 {
   if(wasLogged)
   {
@@ -236,7 +236,7 @@ static void busyWaitIterate(uint64_t availableTimestamp, uint64_t targetTimestam
     uint64_t t=current_millis();
     if(!wasLogged && t-startWaitAtMillis > 10)
     {
-      fprintf(stderr, "Busy wait for simulation of timestamp spent 10 millis. Available global timestamp: %" PRIu64 " required: %" PRIu64 "...", availableTimestamp, targetTimestamp);
+      fprintf(stderr, "Busy wait for simulation of timestamp spent 10 millis. Name: %s Available global timestamp: %" PRIu64 " required: %" PRIu64 "...", debugName, availableTimestamp, targetTimestamp);
       fflush(stderr);
       wasLogged=true;
     }

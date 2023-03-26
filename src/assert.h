@@ -31,12 +31,17 @@ SOFTWARE.
 
 #include "simulator_types.h"
 
-/// Assert function that stops execution of program and logs the stack trace in case the condition is false.
-void assert(bool conditionMustBeTrue);
+#define assert(conditionMustBeTrue) assert_withFileAndPosition(conditionMustBeTrue, __FILE__,__LINE__);
+#define assertErrno(conditionMustBeTrue) assertErrno_withFileAndPosition(conditionMustBeTrue, __FILE__,__LINE__);
+/// Assert function that checks condition and signals failure in case the condition is false.
+/// Signalling failure is platform dependent:
+///  * On PC simulation stops execution of program and logs the current stack trace.
+void assert_withFileAndPosition(bool conditionMustBeTrue, const char * fileName, int line);
 
-/// Assert function that stops execution of program and logs the stack trace in case the condition is false.
-/// Also logs the errno provided by the operating system.
-void assertErrno(bool mustBeTrue);
+/// Assert function that checks condition and signals failure in case the condition is false.
+/// Signalling of failure is same as in case of assert()
+/// Also logs the errno provided by the operating system in case of PC
+void assertErrno_withFileAndPosition(bool mustBeTrue, const char * fileName, int line);
 
 
 #endif /* SIM_PC_HAL_ASSERT_H_ */

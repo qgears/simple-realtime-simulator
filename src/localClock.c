@@ -25,6 +25,9 @@ SOFTWARE.
 #include "localClock.h"
 #include "assert.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 // TODO implement slow down or speed up clock properly
 
 
@@ -200,6 +203,12 @@ static void localClock_advanceTimeGlobal(localClock_t * lc, uint64_t targetGloba
   uint64_t ret=lc->globalTime;
   while(ret<targetGlobalTime)
   {
+    if(lc->exit)
+    {
+      printf("Exit requested by simulator - normal exit\n");
+      fflush(stdout);
+      exit(0);
+    }
     ret=localClock_tryAdvanceTimeGlobal(lc, targetGlobalTime);
   }
 }

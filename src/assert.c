@@ -46,19 +46,20 @@ static void print_trace (void)
   free (strings);
 }
 
-void assert(bool mustBeTrue)
+void assert_withFileAndPosition(bool mustBeTrue, const char * fileName, int line)
 {
 	if(!mustBeTrue)
 	{
-		fprintf( stderr, "Assert fail\n");
+		fprintf( stderr, "Assert fail %s %d\n", fileName, line);
 		print_trace();
 		exit(1);
 	}
 }
-void assertErrno(bool mustBeTrue)
+void assertErrno_withFileAndPosition(bool mustBeTrue, const char * fileName, int line)
 {
 	if(!mustBeTrue)
 	{
+    fprintf( stderr, "Assert fail %s %d\n", fileName, line);
     perror("Assert fail Errno");
 		print_trace();
 		exit(1);

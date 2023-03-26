@@ -78,6 +78,8 @@ typedef struct
   /// Blocking wait for time advancement is not necessary.
   channelObjectSink_t * channelsInFlush[CLOCK_MAX_CHANNELS];
  	localClock_timer_t timers[CLOCK_N_TIMERS];
+ 	/// Require exit of this simulator thread
+ 	volatile bool exit;
 } localClock_t;
 
 
