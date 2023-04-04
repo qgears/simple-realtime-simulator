@@ -32,11 +32,13 @@ SOFTWARE.
 #include "simulator_types.h"
 
 #define assert(conditionMustBeTrue) assert_withFileAndPosition(conditionMustBeTrue, __FILE__,__LINE__);
+#define assertMsg(conditionMustBeTrue, ...) assert_withFileAndPositionMsg(conditionMustBeTrue, __FILE__,__LINE__, __VA_ARGS__);
 #define assertErrno(conditionMustBeTrue) assertErrno_withFileAndPosition(conditionMustBeTrue, __FILE__,__LINE__);
 /// Assert function that checks condition and signals failure in case the condition is false.
 /// Signalling failure is platform dependent:
 ///  * On PC simulation stops execution of program and logs the current stack trace.
 void assert_withFileAndPosition(bool conditionMustBeTrue, const char * fileName, int line);
+void assert_withFileAndPositionMsg(bool conditionMustBeTrue, const char * fileName, int line, const char * format, ...);
 
 /// Assert function that checks condition and signals failure in case the condition is false.
 /// Signalling of failure is same as in case of assert()

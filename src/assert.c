@@ -26,6 +26,7 @@ SOFTWARE.
 #include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 /* Obtain a backtrace and print it to stdout. https://www.gnu.org/software/libc/manual/html_node/Backtraces.html */
 static void print_trace (void)
@@ -55,6 +56,21 @@ void assert_withFileAndPosition(bool mustBeTrue, const char * fileName, int line
 		exit(1);
 	}
 }
+void assert_withFileAndPositionMsg(bool conditionMustBeTrue, const char * fileName, int line, const char * format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  if(!conditionMustBeTrue)
+  {
+    fprintf( stderr, "Assert fail %s %d ", fileName, line);
+    vfprintf( stderr, format, args);
+    fprintf( stderr, "\n");
+    print_trace();
+    exit(1);
+  }
+  va_end(args);
+}
+
 void assertErrno_withFileAndPosition(bool mustBeTrue, const char * fileName, int line)
 {
 	if(!mustBeTrue)
