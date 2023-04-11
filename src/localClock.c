@@ -112,13 +112,19 @@ uint64_t localClock_get_us(localClock_t * lc)
 	value>>=32;
 	return value/1000;
 }
-static uint64_t localClock_tryAdvanceTimeGlobal(localClock_t * lc, uint64_t targetGlobalTime)
+uint64_t localClock_tryAdvanceTimeGlobal(localClock_t * lc, uint64_t targetGlobalTime)
 {
+  if(lc->exit)
+  {
+    printf("Exit requested by simulator - normal exit\n");
+    fflush(stdout);
+    exit(0);
+  }
   uint64_t ret=UINT64_MAX;
 //  int32_t channelIndex=-1;
 //  int32_t timerIndex=-1;
-  bool retry=false;
-  bool waited=false;
+  //bool retry=false;
+  //bool waited=false;
   uint64_t now=lc->globalTime;
     for(int32_t i=0;i<lc->nChannelInSimulate;++i)
     {
@@ -203,12 +209,6 @@ static void localClock_advanceTimeGlobal(localClock_t * lc, uint64_t targetGloba
   uint64_t ret=lc->globalTime;
   while(ret<targetGlobalTime)
   {
-    if(lc->exit)
-    {
-      printf("Exit requested by simulator - normal exit\n");
-      fflush(stdout);
-      exit(0);
-    }
     ret=localClock_tryAdvanceTimeGlobal(lc, targetGlobalTime);
   }
 }
