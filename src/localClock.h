@@ -53,6 +53,7 @@ typedef struct
 	volatile uint64_t period;
 	localClock_timerCallback_t callback;
 	void * parameter;
+  bool allocated;
 } localClock_timer_t;
 
 /// A local clock domain
@@ -112,6 +113,10 @@ uint64_t localClock_ticks_to_us(localClock_t * lc, uint64_t ticks);
 /// @param callback callback function that is called when the timer has elapsed
 /// @param param parameter passed to the callback function - not accessed by the timer itself and may be NULL
 void localClock_setTimer(localClock_t * lc, uint32_t timerIndex, bool enabled, uint64_t timeoutAt, uint64_t period, localClock_timerCallback_t callback, void * param);
+/// Allocate one of the timers
+uint32_t localClock_allocateTimer(localClock_t * lc);
+/// Allocate one of the timers
+void localClock_releaseTimer(localClock_t * lc, uint32_t timerIndex);
 /// Register an output channel with the local clock object. The simulation of the channel is marked to advance in time whenever the clock time is advancing.
 void localClock_registerChannel(localClock_t * lc, channelObject_t * channel);
 /// Register an input channel to be flushed when time is advancing so that the ringbuffer will not overflow and block the writing thread.

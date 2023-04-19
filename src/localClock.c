@@ -45,6 +45,7 @@ void localClock_create(localClock_t * lc, uint64_t initialGlobalTime, uint64_t m
 	for(uint32_t i=0;i<CLOCK_N_TIMERS;++i)
 	{
 		lc->timers[i].enabled=false;
+    lc->timers[i].allocated=false;
 	}
 }
 
@@ -248,6 +249,23 @@ void localClock_setTimer(localClock_t * lc, uint32_t timerIndex, bool enabled, u
 	lc->timers[timerIndex].callback=callback;
 	lc->timers[timerIndex].parameter=param;
 }
+uint32_t localClock_allocateTimer(localClock_t * lc)
+{
+  for(uint32_t i=0;i<CLOCK_N_TIMERS;++i)
+  {
+    if(!lc->timers[i].allocated)
+    {
+      lc->timers[i].allocated=true;
+      return i;
+    }
+  }
+  assert(false);
+}
+void localClock_releaseTimer(localClock_t * lc, uint32_t timerIndex)
+{
+  lc->timers[timerIndex].allocated=false;
+}
+
 uint64_t localClock_us_to_ticks(localClock_t * lc, uint64_t us)
 {
 	uint128_t v=us;
