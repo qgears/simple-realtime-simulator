@@ -94,6 +94,11 @@ void localClock_create(localClock_t * lc, uint64_t initialGlobalTime, uint64_t m
 /// Wait until the local time reaches the given time. This means that the simulated outputs are updated to this time.
 void localClock_waitUntilGlobal(localClock_t * lc, uint64_t globalTime);
 
+/// Wait until the local time reaches the given time or when the first event happens (event can be a timer or an incoming channel data).
+/// In case a timer event happens or an incoming channel has data with a listener then the timer or listener is executed before return
+/// @return time that the global time was advanced until
+uint64_t localClock_tryAdvanceTimeGlobal(localClock_t * lc, uint64_t targetGlobalTime);
+
 uint64_t localClock_currentLocal(localClock_t * lc);
 
 uint64_t localClock_currentGlobal(localClock_t * lc);
