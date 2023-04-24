@@ -90,6 +90,16 @@ uint64_t localClock_toLocal(localClock_t * lc, uint64_t globalTime)
 	value>>=32;
 	return value+lc->addGlobalToLocalTicks;
 }
+uint64_t localClock_localUsToGlobal(localClock_t * lc, uint64_t us)
+{
+  // TODO
+  return us*1000ul;
+}
+uint64_t localClock_localMsToGlobal(localClock_t * lc, uint64_t ms)
+{
+  uint64_t us=ms*1000ul;
+  return localClock_localUsToGlobal(lc, us);
+}
 /*uint64_t localClock_toGlobal(localClock_t * lc, uint64_t localTime)
 {
 	uint128_t value=localTime;
@@ -234,7 +244,7 @@ static bool localClock_executeNextTimerTimeout(localClock_t * lc, uint64_t targe
 }
 */
 
-/// Wait until the local time reaches the given time. This means that the simulated outputs are updated to this time.
+/// Wait until the global time reaches the given time. This means that the simulated outputs are updated to this time.
 void localClock_waitUntilGlobal(localClock_t * lc, uint64_t targetGlobalTime)
 {
 //	while(localClock_executeNextTimerTimeout(lc, targetGlobalTime));

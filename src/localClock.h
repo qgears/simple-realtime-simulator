@@ -105,6 +105,9 @@ uint64_t localClock_currentGlobal(localClock_t * lc);
 
 uint64_t localClock_toLocal(localClock_t * lc, uint64_t globalTime);
 
+uint64_t localClock_localUsToGlobal(localClock_t * lc, uint64_t us);
+uint64_t localClock_localMsToGlobal(localClock_t * lc, uint64_t ms);
+
 uint64_t localClock_get_ms(localClock_t * lc);
 
 uint64_t localClock_get_us(localClock_t * lc);

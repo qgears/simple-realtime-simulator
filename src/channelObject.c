@@ -27,7 +27,7 @@ SOFTWARE.
 #include <sys/time.h>
 #include <stdio.h>
 #include <inttypes.h>
-#include <unistd.h>
+#include <time.h>
 #include "simulator_types.h"
 
 
@@ -225,7 +225,10 @@ static void busyWaitIterate(uint64_t availableTimestamp, uint64_t targetTimestam
   {
     // In case we already waited 10 milliseconds then we guess the other processes are stopped by debugging.
     // In this case proper sleep uses less CPU and performance is not important.
-    usleep(1000);
+    struct timespec t;
+    t.tv_sec = 0u;
+    t.tv_nsec = 1000000u;
+    nanosleep(&t, NULL);
   }
   if(currentTarget!=targetTimestamp)
   {
