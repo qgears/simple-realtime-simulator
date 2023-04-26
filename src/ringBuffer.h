@@ -60,6 +60,11 @@ bool ringBuffer_read(ringBuffer_t * ringBuffer, uint32_t nBytes, uint8_t * data)
 /// Read data from ringbuffer and leave the read pointer unchanged.
 /// @return true means there was enough data in the buffer. false means there was not enough data and the data buffer is unchanged.
 bool ringBuffer_peek(ringBuffer_t * ringBuffer, uint32_t nBytes, uint8_t * data);
+/// Access data in the read part of the ringbuffer. Useful to implement no copy read from the ringbuffer.
+/// @param[out] ptrBuffer Will be set to the current buffer position
+/// @param maxBytes the maximum number of bytes to be processed in a single transaction
+/// @return number of bytes accessible by the pointer. Can be less than all bytes available because when read pointer is reset to 0 then the data is only accessible in two continuous parts
+uint32_t ringBuffer_accessReadBuffer(ringBuffer_t * ringBuffer, uint8_t ** ptrBuffer, uint32_t maxBytes);
 /// Get the number of available bytes to write
 uint32_t ringBuffer_availableWrite(ringBuffer_t * ringBuffer);
 /// Get the number of available bytes to read

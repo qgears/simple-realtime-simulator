@@ -35,14 +35,22 @@ SOFTWARE.
 #define CLOCK_MAX_CHANNELS 8
 /// Maximum number of timers associated with a clock. If has to be increased it only increases RAM usage
 #define CLOCK_N_TIMERS 8
+/// Number of ISRs
+#define ISR_N 64
 
 /// When converting to/from global/local clock this is a divisor used.
 /// This is 2^32 so division by it is implemneted as a shift operation.
 #define BASE_MULTIPLIER ((uint64_t)4294967296ull)
 
+struct localClock_members;
+
 /// Prototype of callback function of a timer
 /// @param parameter user defined parameter object
 typedef void (*localClock_timerCallback_t) (void * parameter);
+
+/// Prototype of callback function of an ISR handler
+/// @param parameter user defined parameter object
+typedef void (*localClock_isrCallback_t) (struct localClock_members * clk, uint32_t isrIndex, void * parameter);
 
 /// A timer connected to the local clock
 /// Both timeoutAt and period are measured in global timestamps!
@@ -56,9 +64,16 @@ typedef struct
   bool allocated;
 } localClock_timer_t;
 
+/// An interrupt handler connected to the local clock
+typedef struct
+{
+  localClock_isrCallback_t callback;
+  void * parameter;
+} localClock_isr_t;
+
 /// A local clock domain
 /// Typically the clock of an MCU
-typedef struct
+typedef struct localClock_members
 {
 	/// The current simulated global time tick
 	uint64_t globalTime;
@@ -79,6 +94,10 @@ typedef struct
   /// Blocking wait for time advancement is not necessary.
   channelObjectSink_t * channelsInFlush[CLOCK_MAX_CHANNELS];
  	localClock_timer_t timers[CLOCK_N_TIMERS];
+ 	bool isrGlobalEnabled;
+ 	uint64_t isrsFlag;
+  uint64_t isrsEnabled;
+  localClock_isr_t isrs[ISR_N];
  	/// Require exit of this simulator thread
  	volatile bool exit;
 } localClock_t;
@@ -121,6 +140,14 @@ uint64_t localClock_ticks_to_us(localClock_t * lc, uint64_t ticks);
 /// @param callback callback function that is called when the timer has elapsed
 /// @param param parameter passed to the callback function - not accessed by the timer itself and may be NULL
 void localClock_setTimer(localClock_t * lc, uint32_t timerIndex, bool enabled, uint64_t timeoutAt, uint64_t period, localClock_timerCallback_t callback, void * param);
+/// Setup an ISR handler.
+void localClock_setIsrHandler(localClock_t * lc, uint32_t isrIndex, localClock_isrCallback_t callback, void * param);
+/// Enable/disable global ISR
+void localClock_setGlobalIsrEnabled(localClock_t * lc, bool enabled);
+/// Enable/disable an ISR by index.
+void localClock_setIsrEnabled(localClock_t * lc, uint32_t isrIndex, bool active);
+/// Activate/deactivate ISR by index. Active and enabled ISR will result in handler being called.
+void localClock_setIsrActive(localClock_t * lc, uint32_t isrIndex, bool active);
 /// Allocate one of the timers
 uint32_t localClock_allocateTimer(localClock_t * lc);
 /// Allocate one of the timers

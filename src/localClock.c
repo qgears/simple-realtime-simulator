@@ -27,9 +27,9 @@ SOFTWARE.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // TODO implement slow down or speed up clock properly
-
 
 void localClock_create(localClock_t * lc, uint64_t initialGlobalTime, uint64_t multiplierToLocal,
 		uint64_t multiplierTo_us, uint64_t multiplier_us_to_ticks, int64_t addGlobalToLocalTicks)
@@ -47,7 +47,22 @@ void localClock_create(localClock_t * lc, uint64_t initialGlobalTime, uint64_t m
 		lc->timers[i].enabled=false;
     lc->timers[i].allocated=false;
 	}
+	lc->isrGlobalEnabled=false;
+  lc->isrsFlag=0u;
+  lc->isrsEnabled=0u;
+  for(uint32_t i=0;i<ISR_N;++i)
+  {
+    lc->isrs[i].callback=NULL;
+    lc->isrs[i].parameter=NULL;
+  }
 }
+void localClock_setIsrHandler(localClock_t * lc, uint32_t isrIndex, localClock_isrCallback_t callback, void * param)
+{
+  assert(isrIndex<ISR_N);
+  lc->isrs[isrIndex].callback=callback;
+  lc->isrs[isrIndex].parameter=param;
+}
+
 
 void localClock_registerChannel(localClock_t * lc, channelObject_t * channel)
 {
@@ -123,7 +138,7 @@ uint64_t localClock_get_us(localClock_t * lc)
 	value>>=32;
 	return value/1000;
 }
-uint64_t localClock_tryAdvanceTimeGlobal(localClock_t * lc, uint64_t targetGlobalTime)
+static inline void localClock_checkExit(localClock_t * lc)
 {
   if(lc->exit)
   {
@@ -131,6 +146,20 @@ uint64_t localClock_tryAdvanceTimeGlobal(localClock_t * lc, uint64_t targetGloba
     fflush(stdout);
     exit(0);
   }
+}
+static inline void localClock_processIsrs(localClock_t * lc)
+{
+  uint64_t enabledAndActive;
+  localClock_checkExit(lc);
+  while(lc->isrGlobalEnabled && (enabledAndActive=(lc->isrsEnabled & lc->isrsFlag)) != 0)
+  {
+    int index=ffsl((int64_t)enabledAndActive)-1;
+    lc->isrs[index].callback(lc, index, lc->isrs[index].parameter);
+  }
+}
+uint64_t localClock_tryAdvanceTimeGlobal(localClock_t * lc, uint64_t targetGlobalTime)
+{
+  localClock_processIsrs(lc);
   uint64_t ret=UINT64_MAX;
 //  int32_t channelIndex=-1;
 //  int32_t timerIndex=-1;
@@ -210,8 +239,54 @@ uint64_t localClock_tryAdvanceTimeGlobal(localClock_t * lc, uint64_t targetGloba
     channelObjectSink_t * channelIn=lc->channelsInSimulate[i];
     channelObject_processEventsUntil(channelIn, ret);
   }
+  localClock_processIsrs(lc);
   return ret;
 }
+
+void localClock_setGlobalIsrEnabled(localClock_t * lc, bool enabled)
+{
+  lc->isrGlobalEnabled = enabled;
+// TODO
+//  if(enabled)
+//  {
+//    localClock_processIsrs(lc);
+//  }
+}
+void localClock_setIsrEnabled(localClock_t * lc, uint32_t isrIndex, bool active)
+{
+  assert(isrIndex<ISR_N);
+  uint64_t mask=1<<isrIndex;
+  if(active)
+  {
+    lc->isrsEnabled|=mask;
+  }else
+  {
+    lc->isrsEnabled&=~mask;
+  }
+  // TODO
+  //  if(enabled)
+  //  {
+  //    localClock_processIsrs(lc);
+  //  }
+}
+void localClock_setIsrActive(localClock_t * lc, uint32_t isrIndex, bool active)
+{
+  assert(isrIndex<ISR_N);
+  uint64_t mask=1<<isrIndex;
+  if(active)
+  {
+    lc->isrsFlag|=mask;
+  }else
+  {
+    lc->isrsFlag&=~mask;
+  }
+  // TODO
+  //  if(enabled)
+  //  {
+  //    localClock_processIsrs(lc);
+  //  }
+}
+
 /// Advance the global time simulated by this object
 /// Mark all outputs simulated until marked time
 /// Set the global time value
