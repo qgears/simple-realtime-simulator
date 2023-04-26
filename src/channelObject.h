@@ -24,6 +24,7 @@ SOFTWARE.
 #ifndef SIMULATOR_CHANNEL_OBJECT_H
 #define SIMULATOR_CHANNEL_OBJECT_H
 #include "ringBuffer.h"
+#include "localClock.h"
 
 /// Maximum number of sinks of a single channel. If needs to be increased it only has RAM usage effect.
 #define MAX_CHANNEL_SINK 4
@@ -64,6 +65,8 @@ typedef struct channelObjectSink_str
 /// The channel object. The event source writes the events into this object.
 typedef struct channelObject_str
 {
+  // The clock that owns this channel
+  localClock_t * clock;
 	/// The simulation of this channel is ready until this timestamp. Readers of the channel
 	/// can advance their simulation until this timestamp without waiting.
 	uint64_t simulatedUntil;
@@ -85,7 +88,7 @@ typedef struct channelObject_str
 /// Initialize the channel structure
 /// @param channel uninitialized static storage channel structure
 /// @param messageSize size of a single message in bytes. A 64 bit timestamp is also stored with each message.
-void channelObject_create(channelObject_t * channel, uint32_t messageSize);
+void channelObject_create(channelObject_t * channel, localClock_t * clock, uint32_t messageSize);
 /// In case minimal latency is not 1 this can be set to a higher value using this method.
 /// Higher value improve the performance of the simulator but means higher event propagation time in the simulated domain.
 void channelObject_setMinimalLatency(channelObject_t * co, uint64_t minimalLatency);

@@ -23,6 +23,7 @@ SOFTWARE.
  */
 
 #include "localClock.h"
+#include "channelObject.h"
 #include "assert.h"
 
 #include <stdio.h>
@@ -138,7 +139,7 @@ uint64_t localClock_get_us(localClock_t * lc)
 	value>>=32;
 	return value/1000;
 }
-static inline void localClock_checkExit(localClock_t * lc)
+void localClock_checkExit(localClock_t * lc)
 {
   if(lc->exit)
   {

@@ -28,6 +28,9 @@ SOFTWARE.
 #include <stdlib.h>
 #include <stdarg.h>
 
+static assertListener_t listener=NULL;
+
+
 /* Obtain a backtrace and print it to stdout. https://www.gnu.org/software/libc/manual/html_node/Backtraces.html */
 static void print_trace (void)
 {
@@ -53,6 +56,10 @@ void assert_withFileAndPosition(bool mustBeTrue, const char * fileName, int line
 	{
 		fprintf( stderr, "Assert fail %s %d\n", fileName, line);
 		print_trace();
+    if(listener!=NULL)
+    {
+      listener();
+    }
 		exit(1);
 	}
 }
@@ -66,6 +73,10 @@ void assert_withFileAndPositionMsg(bool conditionMustBeTrue, const char * fileNa
     vfprintf( stderr, format, args);
     fprintf( stderr, "\n");
     print_trace();
+    if(listener!=NULL)
+    {
+      listener();
+    }
     exit(1);
   }
   va_end(args);
@@ -78,6 +89,16 @@ void assertErrno_withFileAndPosition(bool mustBeTrue, const char * fileName, int
     fprintf( stderr, "Assert fail %s %d\n", fileName, line);
     perror("Assert fail Errno");
 		print_trace();
+		if(listener!=NULL)
+		{
+		  listener();
+		}
 		exit(1);
 	}
 }
+
+void assertAddListener(assertListener_t l)
+{
+  listener = l;
+}
+

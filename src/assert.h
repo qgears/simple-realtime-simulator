@@ -31,6 +31,8 @@ SOFTWARE.
 
 #include "simulator_types.h"
 
+typedef void (*assertListener_t)(void);
+
 #define assert(conditionMustBeTrue) assert_withFileAndPosition(conditionMustBeTrue, __FILE__,__LINE__);
 #define assertMsg(conditionMustBeTrue, ...) assert_withFileAndPositionMsg(conditionMustBeTrue, __FILE__,__LINE__, __VA_ARGS__);
 #define assertErrno(conditionMustBeTrue) assertErrno_withFileAndPosition(conditionMustBeTrue, __FILE__,__LINE__);
@@ -44,6 +46,7 @@ void assert_withFileAndPositionMsg(bool conditionMustBeTrue, const char * fileNa
 /// Signalling of failure is same as in case of assert()
 /// Also logs the errno provided by the operating system in case of PC
 void assertErrno_withFileAndPosition(bool mustBeTrue, const char * fileName, int line);
+void assertAddListener(assertListener_t l);
 
 
 #endif /* SIM_PC_HAL_ASSERT_H_ */

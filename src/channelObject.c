@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
+#include "localClock.h"
 #include "channelObject.h"
 #include "assert.h"
 #include <sys/time.h>
@@ -52,12 +53,14 @@ static void busyWaitIterate(uint64_t availableTimestamp, uint64_t targetTimestam
 static void busyWaitDone(uint64_t availableTimestamp, uint64_t targetTimestamp);
 
 
-void channelObject_create(channelObject_t * co, uint32_t messageSize)
+void channelObject_create(channelObject_t * co, localClock_t * clock, uint32_t messageSize)
 {
+  assert(clock!=NULL);
 	co->messageSize=messageSize;
 	co->nSink=0;
 	co->simulatedUntil=0;
 	co->minimalLatency=1;
+	co->clock=clock;
 }
 
 void channelObject_setMinimalLatency(channelObject_t * co, uint64_t minimalLatency)
@@ -94,6 +97,7 @@ void channelObject_processEventsUntil(channelObjectSink_t * sink, uint64_t times
 	uint8_t * buffer=sink->readBuffer;
 	while(co->simulatedUntil<timestamp)
 	{
+	  localClock_checkExit(sink->host->clock);
 		busyWaitIterate(co->simulatedUntil, timestamp, co->debugName);
 	}
   busyWaitDone(co->simulatedUntil, timestamp);

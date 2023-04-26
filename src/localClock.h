@@ -29,7 +29,7 @@ SOFTWARE.
 /// TODO speed up/down compared to the global clock is not implemented yet.
 
 #include "simulator_types.h"
-#include "channelObject.h"
+struct channelObject_str;
 
 /// Maximum number of channels (source) associated with a clock. If has to be increased it only increases RAM usage
 #define CLOCK_MAX_CHANNELS 8
@@ -84,15 +84,15 @@ typedef struct localClock_members
 	uint64_t multiplier_us_to_ticks;
 	uint32_t nChannelOut;
 	/// All output channels sourced by this clock domain. When time is advanced all output is marked to be simulated until this time
-	channelObject_t * channelsOut[CLOCK_MAX_CHANNELS];
+	struct channelObject_str * channelsOut[CLOCK_MAX_CHANNELS];
 	uint32_t nChannelInSimulate;
 	/// TODO implement - All input channels that are capable of triggering interrupt (pin change interrupt, UART interrupt, etc.)
 	/// Time is advancement is blocked until the simulation of these input channels is ready and these are all scanned for events when advancing time.
- 	channelObjectSink_t * channelsInSimulate[CLOCK_MAX_CHANNELS];
+	struct channelObjectSink_str * channelsInSimulate[CLOCK_MAX_CHANNELS];
   uint32_t nChannelInFlush;
   /// All input channels that are to be flushed so that the ringbuffer does not block the writer side.
   /// Blocking wait for time advancement is not necessary.
-  channelObjectSink_t * channelsInFlush[CLOCK_MAX_CHANNELS];
+  struct channelObjectSink_str * channelsInFlush[CLOCK_MAX_CHANNELS];
  	localClock_timer_t timers[CLOCK_N_TIMERS];
  	bool isrGlobalEnabled;
  	uint64_t isrsFlag;
@@ -153,12 +153,14 @@ uint32_t localClock_allocateTimer(localClock_t * lc);
 /// Allocate one of the timers
 void localClock_releaseTimer(localClock_t * lc, uint32_t timerIndex);
 /// Register an output channel with the local clock object. The simulation of the channel is marked to advance in time whenever the clock time is advancing.
-void localClock_registerChannel(localClock_t * lc, channelObject_t * channel);
+void localClock_registerChannel(localClock_t * lc, struct channelObject_str * channel);
 /// Register an input channel to be flushed when time is advancing so that the ringbuffer will not overflow and block the writing thread.
-void localClock_registerSinkToFlush(localClock_t * lc, channelObjectSink_t * sink);
+void localClock_registerSinkToFlush(localClock_t * lc, struct channelObjectSink_str * sink);
 /// Register an input channel to be listened when time is advancing so that time may not be advanced until the source reaches simulation time.
-void localClock_registerSinkToSimulate(localClock_t * lc, channelObjectSink_t * sink);
+void localClock_registerSinkToSimulate(localClock_t * lc, struct channelObjectSink_str * sink);
+/// Check if exit was called on this clock. Used in busy wait loops to exit the process when the simulation should stop gracefully.
+void localClock_checkExit(localClock_t * lc);
 
-
+#include "channelObject.h"
 
 #endif
