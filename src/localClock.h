@@ -136,7 +136,7 @@ uint64_t localClock_ticks_to_us(localClock_t * lc, uint64_t ticks);
 /// @param timerIndex identify timer to be used
 /// @param enabled enable/disable timer
 /// @param timeoutAt measured in local time
-/// @param period measured in local time ticks
+/// @param period measured in local time ticks. 0 means no periodic execution and timer is set to disabled before first activated
 /// @param callback callback function that is called when the timer has elapsed
 /// @param param parameter passed to the callback function - not accessed by the timer itself and may be NULL
 void localClock_setTimer(localClock_t * lc, uint32_t timerIndex, bool enabled, uint64_t timeoutAt, uint64_t period, localClock_timerCallback_t callback, void * param);

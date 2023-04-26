@@ -85,6 +85,7 @@ void channelObject_waitSimulatedUntil(channelObject_t * co, uint64_t timestamp)
   {
     while(co->simulatedUntil<timestamp)
     {
+      localClock_checkExit(co->clock);
       busyWaitIterate(co->simulatedUntil, timestamp, co->debugName);
     }
     busyWaitDone(co->simulatedUntil, timestamp);
@@ -180,6 +181,7 @@ uint64_t channelObject_insertEvent(channelObject_t * co, uint64_t timestamp, uin
 		  {
         while(ringBuffer_availableWrite(&(sink->buffer))< channelObject_datagramSize(co))
         {
+          localClock_checkExit(sink->host->clock);
           busyWaitIterate(timestamp, timestamp, "write ringbuffer");
         }
         busyWaitDone(timestamp, timestamp);
