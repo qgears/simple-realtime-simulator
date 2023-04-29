@@ -100,6 +100,7 @@ typedef struct localClock_members
   localClock_isr_t isrs[ISR_N];
  	/// Require exit of this simulator thread
  	volatile bool exit;
+ 	char debugName[64];
 } localClock_t;
 
 

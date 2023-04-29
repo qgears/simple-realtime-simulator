@@ -69,7 +69,7 @@ typedef struct channelObject_str
   localClock_t * clock;
 	/// The simulation of this channel is ready until this timestamp. Readers of the channel
 	/// can advance their simulation until this timestamp without waiting.
-	uint64_t simulatedUntil;
+	volatile uint64_t simulatedUntil;
 	/// Latency of causal effect propagation measured in global ticks. Must be at least 1.
 	/// When an event is added to the channel this is added to the event timestamp.
 	/// In case the source simulation is executed until timestamp T then this channel can be marked to simulatedUntil T+minimalLatency. Values more than 1 are useful because such channels can be simulated more efficient. Value 1 means source and sink can signal each other within 1 simulated tick - very small latency.

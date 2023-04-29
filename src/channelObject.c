@@ -58,7 +58,7 @@ void channelObject_create(channelObject_t * co, localClock_t * clock, uint32_t m
   assert(clock!=NULL);
 	co->messageSize=messageSize;
 	co->nSink=0;
-	co->simulatedUntil=0;
+	co->simulatedUntil=clock->globalTime+1;
 	co->minimalLatency=1;
 	co->clock=clock;
 }
