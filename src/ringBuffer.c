@@ -133,6 +133,39 @@ bool ringBuffer_peek(ringBuffer_t * ringBuffer, uint32_t nBytes, uint8_t * data)
 		return false;
 	}
 }
+bool ringBuffer_peekOffset(ringBuffer_t * ringBuffer, uint32_t offset, uint32_t nBytes, uint8_t * data)
+{
+  if(ringBuffer_availableRead(ringBuffer)>=nBytes+offset)
+  {
+    uint32_t at=ringBuffer->ptrRead+offset;
+    if(at>=ringBuffer->bufferSize)
+    {
+      at-=ringBuffer->bufferSize;
+    }
+    uint32_t newPtr=at+nBytes;
+    if(newPtr>ringBuffer->bufferSize)
+    {
+      uint32_t firstSize=ringBuffer->bufferSize-at;
+      uint32_t secondSize=nBytes-firstSize;
+      memcpy(data, &(ringBuffer->buffer[at]), firstSize);
+      at=0;
+      memcpy(&(data[firstSize]), &(ringBuffer->buffer[at]), secondSize);
+      at=secondSize;
+    }else
+    {
+      memcpy(data, &(ringBuffer->buffer[at]), nBytes);
+      at+=nBytes;
+      if(at==ringBuffer->ptrWrite)
+      {
+        at=0;
+      }
+    }
+    return true;
+  }else
+  {
+    return false;
+  }
+}
 uint32_t ringBuffer_accessReadBuffer(ringBuffer_t * ringBuffer, uint8_t ** ptrBuffer, uint32_t maxBytes)
 {
   uint32_t nBytes=ringBuffer_availableRead(ringBuffer);
